@@ -5871,7 +5871,7 @@
 // <31=> 1024 Hz
 
 #ifndef APP_TIMER_CONFIG_RTC_FREQUENCY
-#define APP_TIMER_CONFIG_RTC_FREQUENCY 1
+#define APP_TIMER_CONFIG_RTC_FREQUENCY 0
 #endif
 
 // <o> APP_TIMER_CONFIG_IRQ_PRIORITY  - Interrupt priority
@@ -5903,7 +5903,7 @@
 // <q> APP_TIMER_CONFIG_USE_SCHEDULER  - Enable scheduling app_timer events to app_scheduler
 
 #ifndef APP_TIMER_CONFIG_USE_SCHEDULER
-#define APP_TIMER_CONFIG_USE_SCHEDULER 1
+#define APP_TIMER_CONFIG_USE_SCHEDULER 0 // was 1 in original project
 #endif
 
 // <q> APP_TIMER_KEEPS_RTC_ACTIVE  - Enable RTC always on

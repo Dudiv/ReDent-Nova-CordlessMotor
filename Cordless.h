@@ -18,14 +18,17 @@ extern "C" {
 #define SET_GREEN_ON (nrf_gpio_pin_set(GREEN), nrf_gpio_pin_clear(RED))
 #define RESET_GREEN_ON nrf_gpio_pin_clear(GREEN)
 
+#define SET_YELLOW_ON (nrf_gpio_pin_set(GREEN), nrf_gpio_pin_set(RED))
+#define RESET_YELLO_ON (nrf_gpio_pin_clear(GREEN), nrf_gpio_pin_clear(RED))
+
 #define SET_BLUE_ON nrf_gpio_pin_set(BLUE)
 #define RESET_BLUE_ON nrf_gpio_pin_clear(BLUE)
 #define TOGGLE_BLUE nrf_gpio_pin_toggle(BLUE)
 
 #define TOGGLE_HOLD_POWER nrf_gpio_pin_toggle(HOLD_POWER)
 
-#define CLEAR_BOOST_EN nrf_gpio_pin_set(BOOST_EN)
-#define SET_BOOST_EN nrf_gpio_pin_clear(BOOST_EN)
+#define CLEAR_BOOST_EN nrf_gpio_pin_clear(BOOST_EN)
+#define SET_BOOST_EN nrf_gpio_pin_set(BOOST_EN)
 
 typedef enum{
   OFF = 0,
