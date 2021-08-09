@@ -70,7 +70,7 @@
 #error MISSING CALIBRATED DATA
 #endif
 
-#define APP_CONFIG_TLM_TEMP_VBATT_UPDATE_INTERVAL_SECONDS   10                          //!< How often should the data in the TLM frame be updated.
+#define APP_CONFIG_TLM_TEMP_VBATT_UPDATE_INTERVAL_SECONDS   1 // 10                          //!< How often should the data in the TLM frame be updated.
 #define APP_CONFIG_TLM_ADV_INTERLEAVE_RATIO                 5                           //!< How often should the TLM frame be advertised.
 
 
@@ -107,7 +107,7 @@
 #define PERIPHERAL_LINK_COUNT                               1                           //!< Number of peripheral links used by the application. When changing this number, remember to adjust the RAM settings.
 
 #define APP_CFG_NON_CONN_ADV_TIMEOUT                        0                           //!< Time for which the device must be advertising in non-connectable mode (in seconds). 0 disables the time-out.
-#define APP_CFG_NON_CONN_ADV_INTERVAL_MS                    1000                        //!< The advertising interval for non-connectable advertisement (in milliseconds). This value can vary between 100 ms and 10.24 s.
+#define APP_CFG_NON_CONN_ADV_INTERVAL_MS                    100 // 1000                        //!< The advertising interval for non-connectable advertisement (in milliseconds). This value can vary between 100 ms and 10.24 s.
 #define APP_CFG_CONNECTABLE_ADV_TIMEOUT                     6000                        //!< Time for which the device must be advertising in connectable mode (in 10 millisecond units). 0 disables the time-out.
 #define APP_CFG_CONNECTABLE_ADV_INTERVAL_MS                 100                         //!< The advertising interval for connectable advertisement (in milliseconds). This value can vary between 20 ms and 10.24 s.
 
@@ -160,7 +160,7 @@
                                             0x69, 0x63, 0x73, 0x65, \
                                             0x6d,0x69, 0x00                             //!< "nordicsemi.com". Last byte suffix 0x00 = ".com" according to specification.
 
-#define DEFAULT_FRAME_TYPE                  APP_ES_URL_FRAME_TYPE                       //!< Frame type of default frame.
+#define DEFAULT_FRAME_TYPE                  ES_FRAME_TYPE_TLM //  APP_ES_URL_FRAME_TYPE                       //!< Frame type of default frame.
 #define DEFAULT_FRAME_TX_POWER              0x00                                        //!< Default frame TX power.
 
 /** @brief This value should mimic the data that would be written to the RW ADV Slot characteristic (for example, no RSSI for UID). */

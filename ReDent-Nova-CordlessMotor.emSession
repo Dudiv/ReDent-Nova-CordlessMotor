@@ -2,10 +2,7 @@
 <session>
  <Bookmarks/>
  <Breakpoints groups="Breakpoints" active_group="Breakpoints">
-  <BreakpointListItem trigger="" line="66" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="4" filename="../../../Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/libraries/util/app_error_weak.c" useHWbreakpoint="false"/>
-  <BreakpointListItem trigger="" line="143" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="4" filename="../../../Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/libraries/timer/app_timer2.c" useHWbreakpoint="false"/>
-  <BreakpointListItem trigger="" line="178" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="4" filename="../../../Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/libraries/timer/app_timer2.c" useHWbreakpoint="false"/>
-  <BreakpointListItem trigger="" line="716" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="2" filename="main.c" useHWbreakpoint="false"/>
+  <BreakpointListItem trigger="" line="498" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" group="Breakpoints" type="Breakpoint" state="4" filename="main.c" useHWbreakpoint="false"/>
   <Exceptions set="MemManage;UsageFault_Coprocessor;UsageFault_CheckingError;UsageFault_StateError;BusFault;ExceptionEntryReturnFault;HardFault"/>
  </Breakpoints>
  <ExecutionProfileWindow/>
@@ -28,8 +25,12 @@
   <ProjectSessionItem path="ReDent-Nova-CordlessMotor"/>
   <ProjectSessionItem path="ReDent-Nova-CordlessMotor;ReDent-Nova-CordlessMotor"/>
   <ProjectSessionItem path="ReDent-Nova-CordlessMotor;ReDent-Nova-CordlessMotor;Application"/>
+  <ProjectSessionItem path="ReDent-Nova-CordlessMotor;ReDent-Nova-CordlessMotor;nRF_BLE"/>
+  <ProjectSessionItem path="ReDent-Nova-CordlessMotor;ReDent-Nova-CordlessMotor;nRF_BLE_Services"/>
   <ProjectSessionItem path="ReDent-Nova-CordlessMotor;ReDent-Nova-CordlessMotor;nRF_Drivers"/>
   <ProjectSessionItem path="ReDent-Nova-CordlessMotor;ReDent-Nova-CordlessMotor;nRF_Libraries"/>
+  <ProjectSessionItem path="ReDent-Nova-CordlessMotor;ReDent-Nova-CordlessMotor;nRF_SoftDevice"/>
+  <ProjectSessionItem path="ReDent-Nova-CordlessMotor;ReDent-Nova-CordlessMotor;nRF_TLS"/>
   <ProjectSessionItem path="ReDent-Nova-CordlessMotor;ReDent-Nova-CordlessMotor;Segger Startup Files"/>
  </Project>
  <Register1>
@@ -51,12 +52,19 @@
   <Trace enabled="Yes"/>
  </TraceWindow>
  <Watch1>
-  <Watches active="1" update="Never">
-   <Watchpoint expression="powerOn" name="powerOn" radix="-1" linenumber="717" filename="main.c"/>
-   <Watchpoint expression="err_code" name="err_code" radix="16" linenumber="669" filename="main.c"/>
-   <Watchpoint expression="timer_cfg" name="timer_cfg" radix="-1" linenumber="693" filename="main.c"/>
-   <Watchpoint expression="mp_active_timer" name="mp_active_timer" radix="-1" linenumber="295" filename="../../../Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/libraries/timer/app_timer2.c"/>
-   <Watchpoint expression="info" name="info" radix="-1" linenumber="56" filename="../../../Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/libraries/util/app_error_weak.c"/>
+  <Watches active="1" update="Twice a Second">
+   <Watchpoint expression="powerOn" name="powerOn" radix="-1" linenumber="704" filename="main.c"/>
+   <Watchpoint expression="batteryVoltage" name="batteryVoltage" radix="10" linenumber="459" filename="main.c"/>
+   <Watchpoint expression="batteryState" name="batteryState" radix="-1" linenumber="468" filename="main.c"/>
+   <Watchpoint expression="stateMachine" name="stateMachine" radix="-1" linenumber="726" filename="main.c"/>
+   <Watchpoint expression="buttonPressed" name="buttonPressed" radix="16" linenumber="556" filename="main.c"/>
+   <Watchpoint expression="p_reg" name="p_reg" radix="-1" linenumber="0" filename="../ReDent-Nova-CordlessMotor"/>
+   <Watchpoint expression="p_evt" name="p_evt" radix="-1" linenumber="207" filename="../../../Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/ble/ble_services/eddystone/es_adv.c"/>
+   <Watchpoint expression="m_adv_data" name="m_adv_data" radix="-1" linenumber="214" filename="../../../Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/ble/ble_services/eddystone/es_adv.c"/>
+   <Watchpoint expression="adv_data" name="adv_data" radix="-1" linenumber="65" filename="../../../Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/ble/ble_services/eddystone/es_adv_frame.c"/>
+   <Watchpoint expression="m_reg" name="m_reg" radix="-1" linenumber="691" filename="main.c"/>
+   <Watchpoint expression="pulseCount" name="pulseCount" radix="10" linenumber="0" filename="../ReDent-Nova-CordlessMotor"/>
+   <Watchpoint expression="duty" name="duty" radix="10" linenumber="0" filename="../ReDent-Nova-CordlessMotor"/>
   </Watches>
  </Watch1>
  <Watch2>
@@ -69,21 +77,26 @@
   <Watches active="0" update="Never"/>
  </Watch4>
  <Files>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="715" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="main.c" selected="1" top="692" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="68" useTextEdit="1" openedFrom="C:/Users/lenovo/Desktop/Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/integration/nrfx/legacy/nrf_drv_timer.h" useBinaryEdit="0" left="0" path="../../../Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/modules/nrfx/drivers/include/nrfx_timer.h" selected="0" top="49" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="71" useTextEdit="1" openedFrom="C:/Users/lenovo/Desktop/Programs/BitBucket/ReDent-Nova-CordlessMotor/main.c" useBinaryEdit="0" left="0" path="../../../Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/integration/nrfx/legacy/nrf_drv_timer.h" selected="0" top="44" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="40" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/libraries/pwm/app_pwm.c" selected="0" top="24" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="22" useTextEdit="1" openedFrom="C:/Users/lenovo/Desktop/Programs/BitBucket/ReDent-Nova-CordlessMotor/main.c" useBinaryEdit="0" left="0" path="Cordless.h" selected="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="15" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="custom_board.h" selected="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="514" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/modules/nrfx/drivers/src/nrfx_gpiote.c" selected="0" top="472" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="656" useTextEdit="1" openedFrom="C:/Users/lenovo/Desktop/Programs/BitBucket/ReDent-Nova-CordlessMotor/main.c" useBinaryEdit="0" left="0" path="../../../Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/modules/nrfx/hal/nrf_gpio.h" selected="0" top="637" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="99" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/libraries/util/app_error_weak.c" selected="0" top="76" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="5905" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="sdk_config.h" selected="0" top="5894" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="364" useTextEdit="1" openedFrom="C:/Users/lenovo/Desktop/Programs/BitBucket/ReDent-Nova-CordlessMotor/main.c" useBinaryEdit="0" left="0" path="../../../Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/libraries/timer/app_timer2.c" selected="0" top="341" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="65" useTextEdit="1" openedFrom="C:/Users/lenovo/Desktop/Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/integration/nrfx/legacy/nrf_drv_timer.h" useBinaryEdit="0" left="0" path="../../../Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/modules/nrfx/drivers/src/nrfx_timer.c" selected="0" top="45" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="72" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/libraries/util/app_error.c" selected="0" top="42" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="163" useTextEdit="1" openedFrom="C:/Users/lenovo/Desktop/Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/libraries/timer/app_timer2.c" useBinaryEdit="0" left="0" path="../../../Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/libraries/scheduler/app_scheduler.c" selected="0" top="163" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="160" useTextEdit="1" openedFrom="C:/Users/lenovo/Desktop/Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/libraries/timer/app_timer2.c" useBinaryEdit="0" left="0" path="../../../Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/libraries/util/app_error.h" selected="0" top="137" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="669" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="main.c" selected="1" top="665" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="27" useTextEdit="1" openedFrom="C:/Users/lenovo/Desktop/Programs/BitBucket/ReDent-Nova-CordlessMotor/main.c" useBinaryEdit="0" left="0" path="Cordless.h" selected="0" top="9" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="18" useTextEdit="1" openedFrom="C:/Users/lenovo/Desktop/Programs/BitBucket/ReDent-Nova-CordlessMotor/main.c" useBinaryEdit="0" left="0" path="custom_board.h" selected="0" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="5896" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="sdk_config.h" selected="0" top="5884" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="43" useTextEdit="1" openedFrom="C:/Users/lenovo/Desktop/Programs/BitBucket/ReDent-Nova-CordlessMotor/es_app_config.h" useBinaryEdit="0" left="0" path="../../../Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/ble/ble_services/eddystone/es.h" selected="0" top="24" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="72" useTextEdit="1" openedFrom="C:/Users/lenovo/Desktop/Programs/BitBucket/ReDent-Nova-CordlessMotor/main.c" useBinaryEdit="0" left="0" path="es_app_config.h" selected="0" top="54" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="48" useTextEdit="1" openedFrom="C:/Users/lenovo/Desktop/Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/ble/ble_services/eddystone/es_adv_frame.c" useBinaryEdit="0" left="0" path="../../../Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/ble/ble_services/eddystone/es_slot.c" selected="0" top="26" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="73" useTextEdit="1" openedFrom="C:/Users/lenovo/Desktop/Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/ble/ble_services/eddystone/es_tlm.c" useBinaryEdit="0" left="0" path="../../../Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/ble/ble_services/eddystone/es_battery_voltage_saadc.c" selected="0" top="54" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" openedFrom="C:/Users/lenovo/Desktop/Programs/BitBucket/ReDent-Nova-CordlessMotor/main.c" useBinaryEdit="0" left="0" path="../../../Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/ble/common/ble_conn_params.h" selected="0" top="129" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" openedFrom="C:/Users/lenovo/Desktop/Programs/BitBucket/ReDent-Nova-CordlessMotor/main.c" useBinaryEdit="0" left="0" path="../../../Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/ble/ble_advertising/ble_advertising.h" selected="0" top="183" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="79" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/ble/ble_services/eddystone/es_gatts_write.c" selected="0" top="64" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="62" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/ble/ble_services/eddystone/es_tlm.h" selected="0" top="41" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="384" useTextEdit="1" openedFrom="C:/Users/lenovo/Desktop/Programs/BitBucket/ReDent-Nova-CordlessMotor/main.c" useBinaryEdit="0" left="0" path="../../../Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/ble/nrf_ble_gatt/nrf_ble_gatt.c" selected="0" top="366" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="78" useTextEdit="1" openedFrom="C:/Users/lenovo/Desktop/Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/ble/ble_services/eddystone/nrf_ble_es.c" useBinaryEdit="0" left="0" path="../../../Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/ble/ble_services/eddystone/es_gatts.c" selected="0" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="66" useTextEdit="1" openedFrom="C:/Users/lenovo/Desktop/Programs/BitBucket/ReDent-Nova-CordlessMotor/main.c" useBinaryEdit="0" left="0" path="../../../Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/ble/ble_services/eddystone/nrf_ble_es.h" selected="0" top="48" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="652" useTextEdit="1" openedFrom="C:/Users/lenovo/Desktop/Programs/BitBucket/ReDent-Nova-CordlessMotor/main.c" useBinaryEdit="0" left="0" path="../../../Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/libraries/pwm/app_pwm.c" selected="0" top="633" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="110" useTextEdit="1" openedFrom="C:/Users/lenovo/Desktop/Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/libraries/pwm/app_pwm.c" useBinaryEdit="0" left="0" path="../../../Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/libraries/pwm/app_pwm.h" selected="0" top="91" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="643" useTextEdit="1" openedFrom="C:/Users/lenovo/Desktop/Programs/BitBucket/ReDent-Nova-CordlessMotor/main.c" useBinaryEdit="0" left="0" path="../../../Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/modules/nrfx/hal/nrf_gpio.h" selected="0" top="624" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="409" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/modules/nrfx/drivers/src/nrfx_saadc.c" selected="0" top="374" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="706" useTextEdit="1" openedFrom="" useBinaryEdit="0" left="0" path="../../../Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/modules/nrfx/drivers/src/nrfx_gpiote.c" selected="0" top="686" codecName="Default"/>
  </Files>
  <ARMCrossStudioWindow activeProject="ReDent-Nova-CordlessMotor" fileDialogDefaultFilter="*.c;*.cpp;*.cxx;*.cc;*.h;*.hpp;*.hxx" autoConnectTarget="J-Link" buildConfiguration="Release" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="" debugSearchPath="" autoConnectCapabilities="3199"/>
 </session>

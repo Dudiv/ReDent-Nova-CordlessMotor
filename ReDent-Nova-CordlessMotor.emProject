@@ -53,7 +53,6 @@
       <file file_name="C:/Users/lenovo/Desktop/Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/libraries/crc16/crc16.c" />
       <file file_name="C:/Users/lenovo/Desktop/Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/libraries/timer/drv_rtc.c" />
       <file file_name="C:/Users/lenovo/Desktop/Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/external/cifra_AES128-EAX/eax.c" />
-      <file file_name="C:/Users/lenovo/Desktop/Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/ble/ble_services/eddystone/es_adv.c" />
       <file file_name="C:/Users/lenovo/Desktop/Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/ble/ble_services/eddystone/es_adv_frame.c" />
       <file file_name="C:/Users/lenovo/Desktop/Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/ble/ble_services/eddystone/es_adv_timing.c" />
       <file file_name="C:/Users/lenovo/Desktop/Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/ble/ble_services/eddystone/es_adv_timing_resolver.c" />
@@ -66,7 +65,6 @@
       <file file_name="C:/Users/lenovo/Desktop/Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/ble/ble_services/eddystone/es_slot.c" />
       <file file_name="C:/Users/lenovo/Desktop/Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/ble/ble_services/eddystone/es_slot_reg.c" />
       <file file_name="C:/Users/lenovo/Desktop/Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/ble/ble_services/eddystone/es_stopwatch.c" />
-      <file file_name="C:/Users/lenovo/Desktop/Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/ble/ble_services/eddystone/es_tlm.c" />
       <file file_name="C:/Users/lenovo/Desktop/Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/libraries/fds/fds.c" />
       <file file_name="C:/Users/lenovo/Desktop/Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/external/cifra_AES128-EAX/gf128.c" />
       <file file_name="C:/Users/lenovo/Desktop/Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/libraries/hardfault/hardfault_implementation.c" />
@@ -121,6 +119,9 @@
     <folder Name="Application">
       <file file_name="main.c" />
       <file file_name="sdk_config.h" />
+      <file file_name="es_tlm.c" />
+      <file file_name="es_adv.c" />
+      <file file_name="custom_board.h" />
     </folder>
     <folder Name="nRF_Crypto backend nRF HW">
       <file file_name="C:/Users/lenovo/Desktop/Documents/nRF52832/nRF5_SDK_16.0.0_98a08e2/components/libraries/crypto/backend/nrf_hw/nrf_hw_backend_init.c" />

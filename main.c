@@ -105,35 +105,37 @@ const nrf_drv_timer_t TIMER_2 = NRF_DRV_TIMER_INSTANCE(2);  // Timer to calculat
 bool motorPWM_NotToggling = false;  // Flag signaling if any motor problem
 
 volatile uint32_t LowToHighCount = 0;    // Counting motor PWM frequency
+volatile uint16_t pulseCount = 0;        // Counting number of pulses
 volatile uint16_t batteryVoltage = 0;    // Battery milivolt
 
-volatile bool MotorLowToHigh = false;     // Flag if motor signal high to low
-volatile bool MotorHighToLow = false;     // Flag if motor signal low to high
 volatile bool Motor_error = false;        // Flag indicating state of motor PWM output
 
 volatile bool handPieceConnected = true;  // Flag indicating if hand piece connected
 volatile bool powerOn = false;            // Flag indicating if power stable
-volatile bool buttonPressed = false;      // Flag if button pressed, use to prevent button release after power up
+volatile bool longPress = false;          // Flag if button pressed long time
 
-#define DEFAULT_DUTY  20
+#define DEFAULT_DUTY  65
 volatile uint16_t duty = DEFAULT_DUTY;
-volatile uint32_t motorFreq = 0;         // Holds the motor frequency in Hz
-#define MOTOR_FREQUENCY 289     // Target motor frequency, gear of 3.... and 5000 RFP target
+volatile uint16_t motorFreq = 0;         // Holds the motor frequency in Hz
+#define MOTOR_FREQUENCY 325     // Target motor frequency, gear of 3.... and 5000 RFP target
 
 #define FREQ_US 100             // 1000us = 1ms
 #define ONE_SEC 1000
+#define TWO_SEC 2000
 #define TEN_MIN 600000
 #define LONG_PRESS  2000        // Timeout for long button pressing
 
-#define nHANDPIECE
-#define BREADBOARD
-#define nBLE
+#define nHANDPIECE              // If exist switch to identify handpiece presence 
+#define BREADBOARD              // Pinout for Laird EVB
+#define BLE                    // With or Without BLE transmission
 
 #ifdef BREADBOARD
 #define BUTTON_PRESSED 0UL   // Button pressed
 #else
 #define BUTTON_PRESSED 1UL   // Button pressed
 #endif
+
+#define nMAXON               // Use of Maxon motor driver
 
 
 
@@ -402,14 +404,6 @@ static void button_init(void)
     APP_ERROR_CHECK(err_code);
 }
 
-
-static void timers_init(void)
-{
-    ret_code_t err_code = app_timer_init();
-    APP_ERROR_CHECK(err_code);
-}
-
-
 static void leds_init(void)
 {
     ret_code_t err_code = bsp_init(BSP_INIT_LEDS, NULL);
@@ -443,9 +437,10 @@ void saadc_callback_handler(nrf_drv_saadc_evt_t const * p_event)
 void saadc_init(void)
 {
   ret_code_t err_code;
+  nrf_drv_saadc_uninit(); // SAADC is initialized in the softdevice, and we now change the channel.
 
   nrf_saadc_channel_config_t channel_config = NRFX_SAADC_DEFAULT_CHANNEL_CONFIG_SE(NRF_SAADC_INPUT_AIN1); // Signel ended
-  
+
   err_code = nrf_drv_saadc_init(NULL, saadc_callback_handler);
   APP_ERROR_CHECK(err_code);
 
@@ -481,41 +476,6 @@ void BatteryTest()
 }
 
 /*
-Event handler for highfrequency timer
-*/
-void HF_timer_event_handler(nrf_timer_event_t event_type, void* p_context)
-{
-    //// Stop timer
-    //nrf_drv_timer_disable(&TIMER_2);
-    
-    //// Verify motor PWM toggling
-    //if (LowToHighCount == 0)
-    //  motorPWM_NotToggling = true;
-    LowToHighCount++;
-    //motorFreq = (uint32_t)(LowToHighCount * 100);
-    //if ( motorFreq < (MOTOR_FREQUENCY - 2))
-    //{
-    //  if (duty < 100)
-    //    duty++;
-    //}
-    //else if ( motorFreq > (MOTOR_FREQUENCY + 2))
-    //{
-    //  if (duty > 0)
-    //    duty--;
-    //}
-    //NRF_LOG_INFO("Motor frequency is: %d, Duty is: %d", motorFreq, duty);
-    //app_pwm_channel_duty_set(&m_pwm, 0, duty);
-}
-
-/*
-Stop highfrequency timer
-*/
-void stop_HF_timer(void)
-{
-  nrf_drv_timer_disable(&TIMER_2);
-}
-
-/*
 Start highfrequency timer - timeout in u seconds
 */
 void start_HF_timer(uint32_t timeout)
@@ -537,75 +497,69 @@ void MotorFreqHandler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 {
   if (action == GPIOTE_CONFIG_POLARITY_LoToHi)
   {
-    if(LowToHighCount > 0)
+    pulseCount++;
+    if (pulseCount == /*1*/ 3)   // 3 is done in order to slow the control update to ~10ms (according to HW posibilities)
+                                  // This function execute every ~3ms (330hz motor speed)
     {
-      motorFreq = (uint32_t)(100000 / LowToHighCount);
-      if ( motorFreq < (MOTOR_FREQUENCY - 2))
+      pulseCount = 0;
+      if(LowToHighCount > 0)
       {
-        if (duty < 100)
-          duty++;
+        motorFreq = (uint16_t)(/*10000*/ 30000 / LowToHighCount);    // Number of HF timer between two motor pulses (HF is 100us)
+                                                                      // Value of 30000 becasue of the 3 pulse count to slow control loop
+        if ( motorFreq < (MOTOR_FREQUENCY - 2))
+        {
+          if (duty < 100)
+            duty++;
+        }
+        else if ( motorFreq > (MOTOR_FREQUENCY + 2))
+        {
+          if (duty > 0)
+            duty--;
+        }
+        app_pwm_channel_duty_set(&m_pwm, 0, duty);
       }
-      else if ( motorFreq > (MOTOR_FREQUENCY + 2))
-      {
-        if (duty > 0)
-          duty--;
-      }
-      app_pwm_channel_duty_set(&m_pwm, 0, duty);
+      LowToHighCount = 0;
     }
-    LowToHighCount = 0;
-    // MotorLowToHigh = true;
   }
-  //else if(action == GPIOTE_CONFIG_POLARITY_HiToLo)
-  //{
-  //  MotorHighToLow = true;
-  //}
 }
 
-
-//void HandPieceHandler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
-//{
-//  if ( action == GPIOTE_CONFIG_POLARITY_LoToHi )
-//  {
-//    handPieceConnected = false;
-//    stateMachine = MOVE_TO_IDEL;
-//  }
-//  else
-//  {
-//    handPieceConnected = true;
-//  }
-//}
+#if HANDPIECE
+void HandPieceHandler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
+{
+  if ( action == GPIOTE_CONFIG_POLARITY_LoToHi )
+  {
+    handPieceConnected = false;
+    stateMachine = MOVE_TO_IDEL;
+  }
+  else
+  {
+    handPieceConnected = true;
+  }
+}
+#endif
 
 void UserButtonHandler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 {
   volatile uint32_t pinValue = nrf_gpio_pin_read(USER_BUTTON);
   if (pinValue == BUTTON_PRESSED)   // Button pressed
   {
-    buttonPressed = true;
-    if (stateMachine != ACTIVE)
+    if (stateMachine == ACTIVE)
     {
-      //// Prepare to shut down
-      //app_timer_start(twoSecTimer_id, APP_TIMER_TICKS(2000), NULL);
-
+      stateMachine = MOVE_TO_IDEL;
+    }
+    else if ((stateMachine == IDEL) && (batteryState == BATTERY_OK) && handPieceConnected == true)
+    {
       app_timer_start(longPressTimer_id, APP_TIMER_TICKS(LONG_PRESS), NULL);
+      stateMachine = MOVE_TO_ACTIVE;
     }
   }
   else              // Button release
   {
-    if (buttonPressed)
+    app_timer_stop(longPressTimer_id);  // Stop timer of long press checking
+    if (longPress == true)
     {
-      buttonPressed = false;
-      app_timer_stop(longPressTimer_id);  // Stop timer of long press checking
-      // app_timer_stop(twoSecTimer_id);
-      if (stateMachine == ACTIVE)
-      {
-        stateMachine = MOVE_TO_IDEL;
-      }
-      else if ((stateMachine == IDEL) && (batteryState == BATTERY_OK) && handPieceConnected == true)
-      {
-        stateMachine = MOVE_TO_ACTIVE;
-      }
-      //else if (stateMachine == MOVE_TO_IDEL)
-        //Don't do anything, release after power up
+      longPress = false;
+      stateMachine = MOVE_TO_IDEL;
     }
   }
 }
@@ -625,13 +579,16 @@ static void tenMinTimerHandler(void)
 
 static void oneSecTimerHandler(void)
 {
+  if (stateMachine == ACTIVE)
+  {
+    TOGGLE_BLUE;
+  }
   NRF_LOG_INFO("Motor frequency is: %d, Duty is: %d", motorFreq, duty);
-  // Motor_error = true;   // Indicating one second without motor PWM toggling
 }
 
 static void longPressTimerHandler(void)
 {
-  stateMachine = MOVE_TO_ACTIVE;
+  longPress = true;
 }
 
 void Init_GPIO()
@@ -658,15 +615,58 @@ void Init_GPIO()
     nrf_drv_gpiote_in_init(USER_BUTTON, &in_config3, UserButtonHandler);
 }
 
+/*
+Event handler for highfrequency timer
+*/
+void HF_timer_event_handler(nrf_timer_event_t event_type, void* p_context)
+{
+  // Count HF pulses for motor speed calculation
+  LowToHighCount++;
+}
+
+/*
+Stop highfrequency timer
+*/
+void stop_HF_timer(void)
+{
+  nrf_drv_timer_disable(&TIMER_2);
+}
+
+static void timers_init(void)
+{
+    ret_code_t err_code = app_timer_init();
+    APP_ERROR_CHECK(err_code);
+
+    // Init and config high frequency timer to verify motor PWM toggling
+    nrf_drv_timer_config_t timer_cfg = NRF_DRV_TIMER_DEFAULT_CONFIG;
+    nrf_drv_timer_init(&TIMER_2, &timer_cfg, HF_timer_event_handler);
+  
+    // Create 3 application timers:
+    // - 2 seconds timer to verify 'long press'
+    // - 10 minutes timer to verify 10 minutes in IDEL
+    // - 1 second timer to print duty cycle and motor PWM
+    // - LongPress timer to start and hold motor
+    //err_code = app_timer_create(&twoSecTimer_id, APP_TIMER_MODE_SINGLE_SHOT, twoSecTimerHandler);
+    err_code = app_timer_create(&twoSecTimer_id, APP_TIMER_MODE_REPEATED, twoSecTimerHandler);
+    APP_ERROR_CHECK(err_code);
+    err_code = app_timer_create(&tenMinTimer_id, APP_TIMER_MODE_SINGLE_SHOT, tenMinTimerHandler);
+    APP_ERROR_CHECK(err_code);
+    err_code = app_timer_create(&oneSecTimer_id, APP_TIMER_MODE_REPEATED, oneSecTimerHandler);
+    APP_ERROR_CHECK(err_code);
+    err_code = app_timer_create(&longPressTimer_id, APP_TIMER_MODE_SINGLE_SHOT, longPressTimerHandler);
+    APP_ERROR_CHECK(err_code);
+  
+}
+
 /****************************************
 new code end
 *****************************************/
-
 
 /**
  * @brief Function for application main entry.
  */
 int main(void)
+
 {
     ret_code_t err_code;
 
@@ -689,116 +689,113 @@ int main(void)
     conn_params_init();
     nrf_ble_es_init(on_es_evt);
 #endif
+
     saadc_init();
 // Init state machine
-  stateMachine = MOVE_TO_IDEL;
+    stateMachine = MOVE_TO_IDEL;
   
-  // Init input/output pins
-  Init_GPIO();
+    // Init input/output pins
+    Init_GPIO();
+    
+    // Config PWM library
+    app_pwm_config_t pwm_config = APP_PWM_DEFAULT_CONFIG_1CH(FREQ_US, PWM);
+    pwm_config.pin_polarity[0] = APP_PWM_POLARITY_ACTIVE_HIGH;
+    app_pwm_init(&m_pwm, &pwm_config, NULL);
 
-  // Init and config high frequency timer to verify motor PWM toggling
-  nrf_drv_timer_config_t timer_cfg = NRF_DRV_TIMER_DEFAULT_CONFIG;
-  nrf_drv_timer_init(&TIMER_2, &timer_cfg, HF_timer_event_handler);
+    //app_pwm_enable(&m_pwm);
+    //app_pwm_channel_duty_set(&m_pwm, 0, 0);   // PWM is started with dutycycle of 0
+
+    // Start the 2 seconds timmer to verify long button press
+    err_code = app_timer_start(twoSecTimer_id, APP_TIMER_TICKS(TWO_SEC), NULL);
+    APP_ERROR_CHECK(err_code);
   
-  // Create 3 application timers:
-  // - 2 seconds timer to verify 'long press'
-  // - 10 minutes timer to verify 10 minutes in IDEL
-  // - 1 second timer to print duty cycle and motor PWM
-  // - LongPress timer to start and hold motor
-  //err_code = app_timer_create(&twoSecTimer_id, APP_TIMER_MODE_SINGLE_SHOT, twoSecTimerHandler);
-  err_code = app_timer_create(&twoSecTimer_id, APP_TIMER_MODE_REPEATED, twoSecTimerHandler);
-  APP_ERROR_CHECK(err_code);
-  err_code = app_timer_create(&tenMinTimer_id, APP_TIMER_MODE_SINGLE_SHOT, tenMinTimerHandler);
-  APP_ERROR_CHECK(err_code);
-  err_code = app_timer_create(&oneSecTimer_id, APP_TIMER_MODE_REPEATED, oneSecTimerHandler);
-  APP_ERROR_CHECK(err_code);
-  err_code = app_timer_create(&longPressTimer_id, APP_TIMER_MODE_SINGLE_SHOT, longPressTimerHandler);
-  APP_ERROR_CHECK(err_code);
-  
-  // Start the 2 seconds timmer to verify long button press
-  err_code = app_timer_start(twoSecTimer_id, APP_TIMER_TICKS(2000), NULL);
-  APP_ERROR_CHECK(err_code);
-  
-  // Wait for 2 second start up delay
-  while(false == powerOn);  // DEBUG
-  NRF_LOG_INFO("Power on after 2 seconds");
+    // Wait for 2 second start up delay
+    while(false == powerOn);  // DEBUG
+    NRF_LOG_INFO("Power on after 2 seconds");
 
-  // Config PWM library
-  app_pwm_config_t pwm_config = APP_PWM_DEFAULT_CONFIG_1CH(FREQ_US, PWM);
-  pwm_config.pin_polarity[0] = APP_PWM_POLARITY_ACTIVE_HIGH;
-  app_pwm_init(&m_pwm, &pwm_config, NULL);
-
-  app_pwm_enable(&m_pwm);
-  app_pwm_channel_duty_set(&m_pwm, 0, duty);   // PWM is started with dutycycle of 0
-
-
-  // Enter main loop.
-  for (;;)
-  {
-  // idle_state_handle();
-    BatteryTest();
-
-    if (motorPWM_NotToggling == true)
+    // Enter main loop.
+    for (;;)
     {
-      NRF_LOG_INFO("Motor PWM constant");   // Message for debugging only once
-      motorPWM_NotToggling = false;
+      BatteryTest();
+
+      if (motorPWM_NotToggling == true)
+      {
+        NRF_LOG_INFO("Motor PWM constant");   // Message for debugging only once
+        motorPWM_NotToggling = false;
+      }
+
+      switch(stateMachine)
+      {
+        case MOVE_TO_IDEL:
+          
+          CLEAR_BOOST_EN;
+          nrf_delay_ms(50);
+          // Disable PWM and set it to 0
+          app_pwm_channel_duty_set(&m_pwm, 0, 0);
+          app_pwm_disable(&m_pwm);
+          duty = DEFAULT_DUTY;
+          // Disable motor PWM output events
+          nrf_drv_gpiote_in_event_disable(MOTOR_FREQ_PIN);
+          // Start 10 minutes timer
+          app_timer_start(tenMinTimer_id, APP_TIMER_TICKS(TEN_MIN), NULL);
+          // Stop printing timer
+          app_timer_stop(oneSecTimer_id);
+          RESET_BLUE_ON;    // Reset BLUE led in case it left light
+          stop_HF_timer();
+          
+          motorFreq = 1;    // Set to speed 0 for the last BLE transmission
+
+          // es_adv_timing_stop();
+          es_adv_stop();
+          
+          #ifdef MAXON
+          nrf_gpio_pin_write(18, 0ul);
+          #endif
+
+          // Send motor speed 0 before stopping the BLE transmission
+          NRF_LOG_INFO("Moving to IDEL state");
+
+          nrf_drv_gpiote_in_event_enable(USER_BUTTON, true);
+          stateMachine = IDEL;
+        break;
+
+        case IDEL:
+          idle_state_handle();
+        break;
+
+        case MOVE_TO_ACTIVE:
+          app_timer_stop(tenMinTimer_id);  // Stop the 10 minutes timer started in IDEL state
+          SET_BOOST_EN;
+          nrf_delay_ms(50);
+          app_pwm_enable(&m_pwm);
+          app_pwm_channel_duty_set(&m_pwm, 0, DEFAULT_DUTY);   // PWM is started with default dutycycle
+          #ifdef MAXON
+          nrf_gpio_pin_write(18, 1ul);
+          #else
+          // Enable events on motor PWM output
+          nrf_drv_gpiote_in_event_enable(MOTOR_FREQ_PIN, true);
+          #endif
+          NRF_LOG_INFO("Moving to ACTIVE state");
+          app_timer_start(oneSecTimer_id, APP_TIMER_TICKS(ONE_SEC), NULL);
+          start_HF_timer(100);  // us - Timer use to calculate motor frequency
+          
+          es_adv_start_non_connctable_adv();
+          //es_adv_timing_start();
+
+          stateMachine = ACTIVE;
+        break;
+
+        case ACTIVE:
+          // Insert motorFreq into Eddystone transmission
+          // motorFreq 3 * 60 - Gear ratio and seconds in minute
+          // Start PWM and control motor
+        break;
+
+        default:
+
+        break;
+      }
     }
-
-    switch(stateMachine)
-    {
-      case MOVE_TO_IDEL:
-        //nrf_delay_ms(100);
-        CLEAR_BOOST_EN;
-        // Disable PWM and set it to 0
-        app_pwm_channel_duty_set(&m_pwm, 0, 0);
-        app_pwm_disable(&m_pwm);
-        duty = DEFAULT_DUTY;
-        // Disable motor PWM output events
-        nrf_drv_gpiote_in_event_disable(MOTOR_FREQ_PIN);
-        // Start 10 minutes timer
-        app_timer_start(tenMinTimer_id, APP_TIMER_TICKS(TEN_MIN), NULL);
-        // Stop printing timer
-        app_timer_stop(oneSecTimer_id);
-        stop_HF_timer();
-
-        // Send motor speed 0 before stopping the BLE transmission
-        NRF_LOG_INFO("Moving to IDEL state");
-
-        nrf_drv_gpiote_in_event_enable(USER_BUTTON, true);
-        stateMachine = IDEL;
-      break;
-
-      case IDEL:
-        
-      break;
-
-      case MOVE_TO_ACTIVE:
-        app_timer_stop(tenMinTimer_id);  // Stop the 10 minutes timer started in IDEL state
-        SET_BOOST_EN;
-        nrf_delay_ms(100);
-        app_pwm_enable(&m_pwm);
-        app_pwm_channel_duty_set(&m_pwm, 0, DEFAULT_DUTY);   // PWM is started with dutycycle of 50
-        // Enable events on motor PWM output
-        nrf_drv_gpiote_in_event_enable(MOTOR_FREQ_PIN, true);
-        NRF_LOG_INFO("Moving to ACTIVE state");
-        app_timer_start(oneSecTimer_id, APP_TIMER_TICKS(ONE_SEC), NULL);
-        start_HF_timer(10);  // Timer use to calculate motor frequency
-        stateMachine = ACTIVE;
-      break;
-
-      case ACTIVE:
-        TOGGLE_BLUE;
-        // Insert motorFreq into Eddystone transmission
-        // motorFreq 3 * 60 - Gear ratio and seconds in minute
-        // Start PWM and control motor
-      break;
-
-      default:
-
-      break;
-    }
-  }
-  // idle_state_handle();
 }
 
 
